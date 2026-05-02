@@ -1,0 +1,63 @@
+# =============================================================================
+# NexaStack SaaS — .dockerignore
+# Keep Docker build context small and fast
+# =============================================================================
+
+# ---------- Version control ----------
+.git
+.gitignore
+
+# ---------- Python ----------
+__pycache__
+*.py[cod]
+*.so
+.venv
+venv
+env
+.eggs
+*.egg-info
+
+# ---------- Node ----------
+node_modules
+frontend/node_modules
+
+# ---------- Build artifacts ----------
+frontend/dist
+frontend/build
+backend/dist
+backend/build
+
+# ---------- Environment ----------
+.env
+.env.local
+.env.*.local
+
+# ---------- IDE ----------
+.vscode
+.idea
+*.swp
+*.swo
+
+# ---------- Testing ----------
+.coverage
+htmlcov
+.pytest_cache
+coverage
+
+# ---------- Docker ----------
+docker-compose*.yml
+Dockerfile
+.dockerignore
+
+# ---------- Documentation ----------
+*.md
+LICENSE
+
+# ---------- CI/CD ----------
+.github
+
+# ---------- Misc ----------
+.DS_Store
+Thumbs.db
+*.log
+.cache

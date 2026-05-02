@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F9FAFB;
+    --bg-tertiary: #F3F4F6;
+    --bg-card: #FFFFFF;
+    --bg-sidebar: #FFFFFF;
+    --border: #E5E7EB;
+    --border-light: #F3F4F6;
+    --text-primary: #111827;
+    --text-secondary: #6B7280;
+    --text-tertiary: #9CA3AF;
+  }
+
+  .dark {
+    --bg-primary: #0B0F19;
+    --bg-secondary: #111827;
+    --bg-tertiary: #1F2937;
+    --bg-card: #1F2937;
+    --bg-sidebar: #111827;
+    --border: #1F2937;
+    --border-light: #374151;
+    --text-primary: #F9FAFB;
+    --text-secondary: #9CA3AF;
+    --text-tertiary: #6B7280;
+  }
+
+  /* Global dark mode for ALL form elements */
+  .dark input,
+  .dark textarea,
+  .dark select {
+    background-color: rgba(31, 41, 55, 0.8) !important;
+    border-color: #374151 !important;
+    color: #F9FAFB !important;
+  }
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: #6B7280 !important;
+  }
+  .dark input:focus,
+  .dark textarea:focus,
+  .dark select:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+  }
+  .dark label {
+    color: #D1D5DB;
+  }
+  .dark summary {
+    color: #D1D5DB;
+  }
+  .dark details {
+    color: #D1D5DB;
+  }
+  .dark h3 {
+    color: #F3F4F6;
+  }
+  /* Fix gray background elements in dark */
+  .dark .bg-gray-50 {
+    background-color: rgba(31, 41, 55, 0.5);
+  }
+  .dark .bg-gray-100 {
+    background-color: rgba(31, 41, 55, 0.6);
+  }
+  .dark .text-gray-700 {
+    color: #D1D5DB;
+  }
+  .dark .text-gray-500 {
+    color: #9CA3AF;
+  }
+  .dark .text-gray-600 {
+    color: #9CA3AF;
+  }
+  .dark .text-gray-400 {
+    color: #6B7280;
+  }
+  .dark .border-gray-200 {
+    border-color: #374151;
+  }
+  .dark .border-gray-100 {
+    border-color: #1F2937;
+  }
+  /* Fix green/red status elements in dark */
+  .dark .bg-green-50 {
+    background-color: rgba(16, 185, 129, 0.1);
+  }
+  .dark .text-green-800 {
+    color: #6EE7B7;
+  }
+  .dark .text-green-700 {
+    color: #6EE7B7;
+  }
+  .dark .text-green-600 {
+    color: #34D399;
+  }
+  .dark .bg-green-100 {
+    background-color: rgba(16, 185, 129, 0.15);
+  }
+  .dark .border-green-200 {
+    border-color: rgba(16, 185, 129, 0.2);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+}
+
+@layer utilities {
+  .bg-surface { background-color: var(--bg-primary); }
+  .bg-surface-secondary { background-color: var(--bg-secondary); }
+  .bg-surface-tertiary { background-color: var(--bg-tertiary); }
+  .bg-card {
+    background-color: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  .dark .bg-card {
+    background-color: rgba(31, 41, 55, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  .bg-sidebar { background-color: var(--bg-sidebar); }
+  .border-theme { border-color: var(--border); }
+  .border-theme-light { border-color: var(--border-light); }
+  .text-heading { color: var(--text-primary); }
+  .text-body { color: var(--text-secondary); }
+  .text-muted { color: var(--text-tertiary); }
+
+  .glass {
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .dark .glass {
+    background: rgba(17,24,39,0.8);
+  }
+
+  .glow-border {
+    box-shadow: 0 0 0 1px var(--border), 0 8px 32px rgba(0,0,0,0.06);
+  }
+  .dark .glow-border {
+    box-shadow: 0 0 0 1px var(--border), 0 8px 32px rgba(0,0,0,0.3);
+  }
+}
