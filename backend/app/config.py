@@ -16,6 +16,11 @@ class Settings(BaseSettings):
     RAZORPAY_KEY_SECRET: str = ""
     OPENAI_API_KEY: str = ""
     REDIS_URL: str = "redis://localhost:6379/0"
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    TESTING: bool = False
 
     class Config:
         env_file = ".env"

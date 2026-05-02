@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/Badge';
 import { GradientButton } from '@/components/ui/GradientButton';
 import api from '@/services/api';
+import { useToast } from '@/context/ToastContext';
 import type { Plan, Subscription } from '@/types';
 
 function loadRazorpay(): Promise<boolean> {
@@ -17,11 +18,10 @@ function loadRazorpay(): Promise<boolean> {
 }
 
 export function BillingPage() {
+  const toast = useToast();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState(true);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -33,14 +33,7 @@ export function BillingPage() {
     }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    if (!success) return;
-    const t = setTimeout(() => setSuccess(null), 4000);
-    return () => clearTimeout(t);
-  }, [success]);
-
   const handleSubscribe = async (plan: Plan) => {
-    setError(null);
     try {
       const { data: order } = await api.post('/subscriptions/create-order', { plan_id: plan.id });
 
@@ -53,12 +46,12 @@ export function BillingPage() {
         });
         const subs = await api.get<Subscription[]>('/subscriptions/');
         setSubscriptions(subs.data);
-        setSuccess(`Successfully subscribed to ${plan.name}!`);
+        toast.success(`Subscribed to ${plan.name}!`);
         return;
       }
 
       const loaded = await loadRazorpay();
-      if (!loaded) { setError('Payment gateway unavailable'); return; }
+      if (!loaded) { toast.error('Payment failed. Try again.'); return; }
 
       const rzp = new (window as any).Razorpay({
         key: order.key_id,
@@ -76,14 +69,14 @@ export function BillingPage() {
           });
           const subs = await api.get<Subscription[]>('/subscriptions/');
           setSubscriptions(subs.data);
-          setSuccess(`Successfully subscribed to ${plan.name}!`);
+          toast.success(`Subscribed to ${plan.name}!`);
         },
         prefill: { name: '', email: '' },
         theme: { color: '#6366F1' },
       });
       rzp.open();
     } catch {
-      setError('Failed to initiate payment. Please try again.');
+      toast.error('Payment failed. Try again.');
     }
   };
 
@@ -105,19 +98,6 @@ export function BillingPage() {
         <h1 className="text-3xl font-bold font-heading text-gray-900">Billing & Plans</h1>
         <p className="text-gray-500 mt-1">Manage your subscriptions</p>
       </motion.div>
-
-      {success && (
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mt-4 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-medium">
-          ✓ {success}
-        </motion.div>
-      )}
-
-      {error && (
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mt-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium flex items-center justify-between">
-          <span>⚠ {error}</span>
-          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600 ml-4">✕</button>
-        </motion.div>
-      )}
 
       {activeSub && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8 bg-gradient-to-r from-primary-500 to-accent-500 rounded-2xl p-6 text-white">

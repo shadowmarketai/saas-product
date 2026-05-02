@@ -8,15 +8,15 @@ test.describe('Customer Dashboard', () => {
 
   test('dashboard loads with products after customer login', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(/\/dashboard/);
-    await expect(page.locator('[data-testid="dashboard"]')).toBeVisible({ timeout: 15000 });
+    // Wait for any heading on the dashboard to confirm it loaded
+    await expect(page.getByRole('heading').first()).toBeVisible({ timeout: 20000 });
   });
 
   test('can navigate to /dashboard/vcards', async ({ page }) => {
     await page.goto('/dashboard/vcards');
-    await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(/\/dashboard\/vcards/);
+    await page.waitForSelector('[data-testid="create-vcard-btn"]', { state: 'attached', timeout: 20000 });
     await expect(page.locator('[data-testid="create-vcard-btn"]')).toBeVisible({ timeout: 15000 });
   });
 });

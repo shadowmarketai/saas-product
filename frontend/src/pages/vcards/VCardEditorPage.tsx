@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { vcardApi } from '@/services/vcardApi';
+import { useToast } from '@/context/ToastContext';
 import { VCardRenderer, TEMPLATE_LIST } from '@/components/vcard/VCardRenderer';
 import { useTheme } from '@/context/ThemeContext';
 import { cn } from '@/lib/utils';
@@ -61,6 +62,7 @@ const VCARD_COLOR_KEYS: { key: string; label: string }[] = [
 export function VCardEditorPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
   const { isDark } = useTheme();
   const [form, setForm] = useState<VCardCreatePayload>(EMPTY_CARD);
   const [activeSection, setActiveSection] = useState<Section>('template');
@@ -120,6 +122,9 @@ export function VCardEditorPage() {
         const created = await vcardApi.create(form);
         navigate(`../vcards/${created.id}/edit`, { replace: true });
       }
+      toast.success('VCard saved!');
+    } catch {
+      toast.error('Failed to save');
     } finally {
       setSaving(false);
     }

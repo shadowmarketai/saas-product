@@ -9,6 +9,7 @@ import os
 # Override the database URL BEFORE any app imports touch config
 os.environ.setdefault("DATABASE_URL", "sqlite:///./test.db")
 os.environ.setdefault("SECRET_KEY", "test-secret-key-for-testing-only")
+os.environ.setdefault("TESTING", "true")
 
 # Register SQLite compiler overrides for PostgreSQL-specific types
 from sqlalchemy.dialects.postgresql import JSONB, JSON as PG_JSON  # noqa: E402

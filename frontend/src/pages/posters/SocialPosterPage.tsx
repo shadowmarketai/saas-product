@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@/context/ThemeContext';
+import { useToast } from '@/context/ToastContext';
 import { cn } from '@/lib/utils';
 import api from '@/services/api';
 import type { Product } from '@/types';
@@ -36,9 +37,11 @@ function AiCaptionPanel({ businessName, onClose }: AiPanelProps) {
   const [generating, setGenerating] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const { isDark } = useTheme();
+  const toast = useToast();
 
   const generate = async () => {
     setGenerating(true);
+    toast.info('Generating captions...');
     try {
       const res = await api.post<CaptionResult>('/ai/generate-caption', { ...form, platforms: ['instagram', 'facebook', 'whatsapp'] });
       setResult(res.data);
@@ -178,6 +181,7 @@ function AiCaptionPanel({ businessName, onClose }: AiPanelProps) {
 export function SocialPosterPage() {
   const navigate = useNavigate();
   const { isDark } = useTheme();
+  const toast = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [aiPanel, setAiPanel] = useState<{ open: boolean; businessName: string }>({ open: false, businessName: '' });
@@ -191,6 +195,7 @@ export function SocialPosterPage() {
   const handleDelete = async (id: number) => {
     await api.delete(`/products/${id}`);
     setProducts((prev) => prev.filter((p) => p.id !== id));
+    toast.success('Deleted');
   };
 
   const handlePublish = async (id: number) => {

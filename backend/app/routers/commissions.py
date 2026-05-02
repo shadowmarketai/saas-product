@@ -84,3 +84,20 @@ async def process_commission(
     commission.status = CommissionStatus.paid
     db.commit()
     return {"message": "Commission marked as paid"}
+
+
+@router.patch("/{commission_id}")
+async def update_commission_status(
+    commission_id: int,
+    status: CommissionStatus,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_superadmin),
+) -> dict:
+    """Update commission status to any valid CommissionStatus value (pending/processing/paid)."""
+    commission = db.query(Commission).filter(Commission.id == commission_id).first()
+    if not commission:
+        raise HTTPException(404, "Commission not found")
+
+    commission.status = status
+    db.commit()
+    return {"id": commission_id, "status": status.value}

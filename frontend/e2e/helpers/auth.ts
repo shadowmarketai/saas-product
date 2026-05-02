@@ -6,8 +6,8 @@ interface LoginResponse {
 }
 
 /**
- * Login via API and inject tokens into localStorage.
- * Call this in beforeEach for fast auth without UI login flow.
+ * Login via API, inject tokens, then wait for AuthContext to fully resolve
+ * before returning. This prevents tests from racing against the /auth/me call.
  */
 export async function loginViaApi(
   page: Page,
@@ -15,7 +15,6 @@ export async function loginViaApi(
   email: string,
   password: string
 ) {
-  // Hit backend directly with OAuth2 form data
   const formData = new URLSearchParams();
   formData.append('username', email);
   formData.append('password', password);
@@ -27,8 +26,11 @@ export async function loginViaApi(
 
   const tokens = (await resp.json()) as LoginResponse;
 
-  // Navigate to app root first so origin is set, then inject tokens
+  // Navigate to root first so the origin is set for localStorage
   await page.goto('/');
+  await page.waitForLoadState('domcontentloaded');
+
+  // Inject tokens
   await page.evaluate(
     ({ accessToken, refreshToken }) => {
       localStorage.setItem('access_token', accessToken);
@@ -36,4 +38,10 @@ export async function loginViaApi(
     },
     { accessToken: tokens.access_token, refreshToken: tokens.refresh_token }
   );
+
+  // Navigate to /home which triggers the RoleRedirect component.
+  // It waits for AuthContext.isLoading=false, then redirects to the role dashboard.
+  // Waiting for this redirect guarantees auth is fully resolved before the test proceeds.
+  await page.goto('/home');
+  await page.waitForURL(/\/(super-admin|franchise|dashboard)/, { timeout: 20000 });
 }

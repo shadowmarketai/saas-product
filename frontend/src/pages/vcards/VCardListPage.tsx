@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { vcardApi } from '@/services/vcardApi';
+import { useToast } from '@/context/ToastContext';
 import { useTheme } from '@/context/ThemeContext';
 import { cn } from '@/lib/utils';
 import { TEMPLATE_LIST } from '@/components/vcard/VCardRenderer';
@@ -16,6 +17,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export function VCardListPage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const { isDark } = useTheme();
   const [cards, setCards] = useState<VCardData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,11 +30,13 @@ export function VCardListPage() {
   const handleDelete = async (id: number) => {
     await vcardApi.remove(id);
     setCards((prev) => prev.filter((c) => c.id !== id));
+    toast.success('VCard deleted');
   };
 
   const handlePublish = async (id: number) => {
     const updated = await vcardApi.publish(id);
     setCards((prev) => prev.map((c) => (c.id === id ? updated : c)));
+    toast.success('VCard published!');
   };
 
   const copyShareLink = (slug: string) => {

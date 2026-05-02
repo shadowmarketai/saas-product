@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { minisiteApi } from '@/services/minisiteApi';
+import { useToast } from '@/context/ToastContext';
 import { SiteRenderer } from '@/components/minisite/SiteRenderer';
 import { siteTemplateConfigs } from '@/components/minisite/siteTemplateConfigs';
 import { getPresetForTemplate, PRESET_TEMPLATE_IDS } from '@/components/minisite/templatePresets';
@@ -95,6 +96,7 @@ const SITE_COLOR_KEYS: { key: string; label: string; group: string }[] = [
 export function MiniSiteEditorPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
   const { isDark } = useTheme();
   const [form, setForm] = useState<MiniSiteCreatePayload>(EMPTY_SITE);
   const [activeSection, setActiveSection] = useState<Section>('template');
@@ -131,6 +133,9 @@ export function MiniSiteEditorPage() {
         const created = await minisiteApi.create(form);
         navigate(`../websites/${created.id}/edit`, { replace: true });
       }
+      toast.success('Website saved!');
+    } catch {
+      toast.error('Failed to save');
     } finally {
       setSaving(false);
     }

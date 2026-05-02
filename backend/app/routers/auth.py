@@ -1,7 +1,7 @@
 import logging
 import secrets
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -17,6 +17,7 @@ from app.auth.jwt import (
 from app.config import settings
 from app.database import get_db
 from app.models.user import User, UserRole
+from app.rate_limit import limiter
 from app.schemas.auth import (
     GoogleAuthRequest,
     RefreshRequest,
@@ -25,13 +26,15 @@ from app.schemas.auth import (
     UserResponse,
 )
 from app.services import tenant_service, user_service
+from app.services.email_service import send_verification_email
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/register", response_model=UserResponse, status_code=201)
-async def register(req: RegisterRequest, db: Session = Depends(get_db)) -> dict:
+@limiter.limit("5/minute")
+async def register(request: Request, req: RegisterRequest, db: Session = Depends(get_db)) -> dict:
     if user_service.get_user_by_email(db, req.email):
         raise HTTPException(400, "Email already registered")
 
@@ -56,14 +59,19 @@ async def register(req: RegisterRequest, db: Session = Depends(get_db)) -> dict:
     db.commit()
     db.refresh(user)
 
+    send_verification_email(user.email, token, settings.FRONTEND_URL)
+
     resp = UserResponse.model_validate(user)
     resp.verification_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
     return resp.model_dump()
 
 
 @router.post("/login", response_model=Token)
+@limiter.limit("10/minute")
 async def login(
-    form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+    request: Request,
+    form: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
 ) -> dict:
     user = user_service.get_user_by_email(db, form.username)
     if not user or not user.hashed_password:

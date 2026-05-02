@@ -3,10 +3,15 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
+import os
 
 from app.config import settings
 from app.exceptions import AppException
 from app.middleware.tenant import TenantMiddleware
+from app.rate_limit import limiter
 from app.routers import (
     ai,
     analytics,
@@ -19,6 +24,7 @@ from app.routers import (
     support,
     templates,
     tenants,
+    uploads,
     users,
     vcard,
     minisite,
@@ -34,6 +40,9 @@ app = FastAPI(
     description="All-in-One White Label SaaS Platform",
     version="1.0.0",
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -59,7 +68,11 @@ app.include_router(vcard.router, prefix="/api/v1")
 app.include_router(minisite.router, prefix="/api/v1")
 app.include_router(qrmenu.router, prefix="/api/v1")
 app.include_router(ws.router)
+app.include_router(uploads.router, prefix="/api/v1")
 app.include_router(ai.router, prefix="/api/v1")
+
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 @app.exception_handler(AppException)

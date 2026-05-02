@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { NotificationBell } from '@/components/ui/NotificationBell';
 import { cn } from '@/lib/utils';
 
 interface NavItem { label: string; path: string; icon: string }
@@ -116,6 +117,7 @@ export function Sidebar() {
 
       {/* Bottom */}
       <div className={cn('p-3 border-t space-y-3', isDark ? 'border-gray-800' : 'border-gray-100')}>
+        <NotificationBell collapsed={collapsed} />
         <div className={cn('flex items-center', collapsed ? 'justify-center' : 'justify-between px-2')}>
           {!collapsed && <span className="text-xs font-medium text-muted">{isDark ? 'Dark' : 'Light'}</span>}
           <ThemeToggle compact={collapsed} />

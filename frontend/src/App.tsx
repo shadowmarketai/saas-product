@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { LandingPage } from './pages/LandingPage';
@@ -11,15 +13,21 @@ import { FranchisesPage } from './pages/superadmin/FranchisesPage';
 import { AdminCustomersPage } from './pages/superadmin/CustomersPage';
 import { AdminProductsPage } from './pages/superadmin/ProductsPage';
 import { TemplatesPage } from './pages/superadmin/TemplatesPage';
+import { RevenuePage } from './pages/superadmin/RevenuePage';
+import { PayoutsPage } from './pages/superadmin/PayoutsPage';
+import { SettingsPage } from './pages/superadmin/SettingsPage';
 import { FranchiseDashboard } from './pages/franchise/DashboardPage';
 import { FranchiseCustomersPage } from './pages/franchise/CustomersPage';
 import { CreateProductPage } from './pages/franchise/CreateProductPage';
 import { EarningsPage } from './pages/franchise/EarningsPage';
 import { ShowcasePage } from './pages/franchise/ShowcasePage';
+import { ReferralsPage } from './pages/franchise/ReferralsPage';
+import { MarketingPage } from './pages/franchise/MarketingPage';
 import { CustomerDashboard } from './pages/customer/DashboardPage';
 import { EditProductPage } from './pages/customer/EditProductPage';
 import { AnalyticsPage } from './pages/customer/AnalyticsPage';
 import { BillingPage } from './pages/customer/BillingPage';
+import { QRCodesPage } from './pages/customer/QRCodesPage';
 import { SupportPage } from './pages/shared/SupportPage';
 import { ProductViewPage } from './pages/public/ProductViewPage';
 import { VCardListPage } from './pages/vcards/VCardListPage';
@@ -37,6 +45,7 @@ import { GoogleReviewsPublicPage } from './pages/reviews/GoogleReviewsPublicPage
 import { SocialPosterPage } from './pages/posters/SocialPosterPage';
 import { WhatsAppListPage } from './pages/chatbot/WhatsAppListPage';
 import { VerifyEmailPage } from './pages/auth/VerifyEmailPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, retry: 1 } },
@@ -54,7 +63,9 @@ function RoleRedirect() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <ErrorBoundary>
         <BrowserRouter>
           <Routes>
             {/* Public Routes */}
@@ -84,6 +95,9 @@ export default function App() {
               <Route path="customers" element={<AdminCustomersPage />} />
               <Route path="products" element={<AdminProductsPage />} />
               <Route path="templates" element={<TemplatesPage />} />
+              <Route path="revenue" element={<RevenuePage />} />
+              <Route path="payouts" element={<PayoutsPage />} />
+              <Route path="settings" element={<SettingsPage />} />
               <Route path="vcards" element={<VCardListPage />} />
               <Route path="vcards/new" element={<VCardEditorPage />} />
               <Route path="vcards/:id/edit" element={<VCardEditorPage />} />
@@ -120,6 +134,8 @@ export default function App() {
               <Route path="create" element={<CreateProductPage />} />
               <Route path="earnings" element={<EarningsPage />} />
               <Route path="showcase" element={<ShowcasePage />} />
+              <Route path="referrals" element={<ReferralsPage />} />
+              <Route path="marketing" element={<MarketingPage />} />
               <Route path="vcards" element={<VCardListPage />} />
               <Route path="vcards/new" element={<VCardEditorPage />} />
               <Route path="vcards/:id/edit" element={<VCardEditorPage />} />
@@ -155,6 +171,7 @@ export default function App() {
               <Route path="products/:id/edit" element={<EditProductPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="billing" element={<BillingPage />} />
+              <Route path="qr-codes" element={<QRCodesPage />} />
               <Route path="vcards" element={<VCardListPage />} />
               <Route path="vcards/new" element={<VCardEditorPage />} />
               <Route path="vcards/:id/edit" element={<VCardEditorPage />} />
@@ -177,10 +194,12 @@ export default function App() {
               <Route path="support" element={<SupportPage />} />
             </Route>
 
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </BrowserRouter>
-      </AuthProvider>
+          </ErrorBoundary>
+        </AuthProvider>
+      </ToastProvider>
     </QueryClientProvider>
   );
 }

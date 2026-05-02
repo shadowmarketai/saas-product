@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { GradientButton } from '@/components/ui/GradientButton';
+import { useToast } from '@/context/ToastContext';
 import { ColorPicker } from '@/components/ui/ColorPicker';
 import { ThemeSelector } from '@/components/ui/ThemeSelector';
 import type { Theme } from '@/components/ui/ThemeSelector';
@@ -38,6 +39,7 @@ const FONT_OPTIONS = [
 ];
 
 export function CreateProductPage() {
+  const toast = useToast();
   const [step, setStep] = useState<'select' | 'form'>('select');
   const [selectedType, setSelectedType] = useState<ProductType>('vcard');
   const [customers, setCustomers] = useState<User[]>([]);
@@ -94,6 +96,7 @@ export function CreateProductPage() {
       setCreatedSlug(res.data.slug);
       // Auto-publish
       await api.patch(`/products/${res.data.id}/publish`);
+      toast.success('Product created & published!');
       setSuccess(true);
     } catch (err) {
       const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
